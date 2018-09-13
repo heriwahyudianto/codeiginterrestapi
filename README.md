@@ -21,6 +21,9 @@ insert new transfer with post method: http://localhost/v1/transfers
 
 payload body : fromcustomerid, type, amount, descr, tocustomerid
 
+## tools
+sublime text, postman, firefox, heidisql
+
 ## database schema
 
 CREATE TABLE `customer` (
