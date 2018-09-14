@@ -23,5 +23,17 @@ class Transaction_model extends CI_Model {
     	$this->db->insert('transaction', $todatas);
     	return 1;    
     }
+    public function saldo()
+    {
+        $this->db->select('SUM(debet) AS debet, SUM(credit) AS credit');
+        $this->db->where('type<>3');
+        $this->db->group_by("customerid");
+        $datas=$this->db->get('transaction')->result_array();
+        $saldo=0;
+        foreach ($datas as $value) {
+            $saldo=$saldo+($value['debet']-$value['credit']);       
+        }        
+        return [$saldo];
+    }
 } 
 ?>

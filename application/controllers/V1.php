@@ -20,16 +20,17 @@ require APPPATH . 'libraries/Format.php';
  * @link            https://github.com/chriskacerguis/codeigniter-restserver
  */
 class V1 extends REST_Controller {
-    function __construct()
+    public function __construct($config = 'rest')
     {
-        // Construct the parent class
+        header('Access-Control-Allow-Origin: *');
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
         parent::__construct();
-
+        //TODO JWT (json web token)
         // Configure limits on our controller methods
         // Ensure you have created the 'limits' table and enabled 'limits' within application/config/rest.php
-        $this->methods['users_get']['limit'] = 500; // 500 requests per hour per user/key
-        $this->methods['users_post']['limit'] = 100; // 100 requests per hour per user/key
-        $this->methods['users_delete']['limit'] = 50; // 50 requests per hour per user/key
+        $this->methods['customers_get']['limit'] = 500; // 500 requests per hour per user/key
+        $this->methods['customers_post']['limit'] = 100; // 100 requests per hour per user/key
+        $this->methods['customers_delete']['limit'] = 50; // 50 requests per hour per user/key
     }
 
     public function customers_get()
@@ -298,11 +299,44 @@ class V1 extends REST_Controller {
         $datas= $this->post();
         //TO DO validation
         $this->load->model('transaction_model'); 
-        //print_r($datas); die();
-        //Array ( [fromcustomerid] => 2 [type] => 2 [amount] => 0 [descr] => tarik [tocustomerid] => 3 )       
-        $fromdatas=['customerid'=>$datas['fromcustomerid'],'type'=>3, 'debet'=>$datas['amount'],'descr'=>'transfer ke '.$datas['tocustomerid']];
-        $todatas=['customerid'=>$datas['tocustomerid'],'type'=>3, 'credit'=>$datas['amount'],'descr'=>'transfer dari '.$datas['fromcustomerid']];
+        $this->load->model('customer_model');
+        $tocustomerid= $this->customer_model->getbyaccount($datas['toaccountnumber']);
+        //TO DO if no toaccountnumber
+        $fromdatas=['customerid'=>$datas['fromcustomerid'],'type'=>3, 'credit'=>$datas['amount'],'descr'=>'transfer ke '.$tocustomerid];
+        $todatas=['customerid'=>$tocustomerid,'type'=>3, 'debet'=>$datas['amount'],'descr'=>'transfer dari '.$datas['fromcustomerid']];
         $transaction=$this->transaction_model->transfer($fromdatas,$todatas);
         $this->set_response([$fromdatas,$todatas], REST_Controller::HTTP_CREATED); // CREATED (201) being the HTTP response code
+    }
+
+    public function login_post()
+    {
+        $datas= $this->post();
+        //TO DO validation
+        $this->load->model('customer_model'); 
+        $customer=$this->customer_model->login($datas);
+        if (count($customer))
+        {
+            // TO DO token
+            $this->set_response($customer, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
+        }
+        else
+        {
+            $this->set_response([
+                'status' => FALSE,
+                'message' => 'Customer could not be found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
+    public function owner_get()
+    {
+        $this->load->model('transaction_model');
+        $transactions=$this->transaction_model->saldo();    
+        // Check if the users data store contains users (in case the database result returns NULL)
+        if ($transactions)
+        {
+            // Set the response and exit
+            $this->response($transactions, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
+        }
     }
 }
