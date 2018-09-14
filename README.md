@@ -7,19 +7,28 @@ require chriskacerguis/codeigniter-restserver
 ## customer api
 
 get all customers: http://localhost/v1/customers
+
 insert new customer with post method: http://localhost/v1/customers
+
 get cusomer by id: http://localhost/v1/customer/id/1
 
 ## transaction api
 
 get all transactions: http://localhost/v1/transactions
+
 get all transaction by customer id: http://localhost/v1/transaction/customerid/1
+
 insert new transaction with post method: http://localhost/v1/transactions
+
 
 ### transfer api
 insert new transfer with post method: http://localhost/v1/transfers
 
-payload body : fromcustomerid, type, amount, descr, tocustomerid
+payload body : fromcustomerid,  amount, toaccountnumber
+
+### owner api
+get grand total saldo: http://localhost/v1/owner
+
 
 ## tools
 composer, git, npm, sublime text, postman, firefox, heidisql, grunt
