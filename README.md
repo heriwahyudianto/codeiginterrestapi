@@ -22,7 +22,7 @@ insert new transfer with post method: http://localhost/v1/transfers
 payload body : fromcustomerid, type, amount, descr, tocustomerid
 
 ## tools
-composer, sublime text, postman, firefox, heidisql, grunt
+composer, git, npm, sublime text, postman, firefox, heidisql, grunt
 
 ## database schema
 
@@ -42,7 +42,7 @@ CREATE TABLE `customer` (
 CREATE TABLE `transaction` (
   `id` int(11) NOT NULL,
   `customerid` int(11) NOT NULL,
-  `type` smallint(6) DEFAULT '1' COMMENT '1=nabung, 2=tarik, 3=tarik',
+  `type` smallint(6) DEFAULT '1' COMMENT '1=nabung, 2=tarik, 3=transfer',
   `debet` float NOT NULL DEFAULT '0',
   `credit` float NOT NULL DEFAULT '0',
   `descr` text,
